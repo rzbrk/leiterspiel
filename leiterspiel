@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Games::Dice 'roll';
+use Switch;
+
+print "Willkommen beim Leiterspiel!\n";
+spiel(4);
+
+
+# Hauptroutine für das Spiel
+sub spiel
+{
+    my $anz_spieler = shift;
+
+    my $runde = 0;
+    my $spielende = 0;
+    my $gewinner = -1;
+    my @felder = (0) x $anz_spieler;
+
+    while ($spielende != 1)
+    {
+        $runde = $runde + 1;
+        print "\nRunde $runde\n";
+        sleep(1);
+
+        foreach my $spieler (0..$#felder)
+        {
+            # Wuefeln
+            my $wurf = wuerfel();
+
+            print "  Spieler $spieler wuerfelt $wurf";
+
+            if ($felder[$spieler] + $wurf < 100)
+            {
+                $felder[$spieler] = $felder[$spieler] + $wurf;
+            }
+
+            print ", rueckt vor auf Feld $felder[$spieler]";
+
+            $felder[$spieler] = leiter($felder[$spieler]);
+
+            print " und springt auf Feld $felder[$spieler].\n";
+
+            sleep(1);
+
+            if ($felder[$spieler] == 99 && $spielende != 1)
+            {
+                $spielende = 1;
+                $gewinner = $spieler;
+                last;
+            }
+
+        }
+
+    }
+
+    print "\nSpieler $gewinner gewinnt das Spiel.\n\n";
+}
+
+# Ueberpruefe, ob Spieler Felder springen muss
+sub leiter
+{
+    my $feld_in = shift;
+    my $feld_out;
+
+    switch($feld_in)
+    {
+        case ( 6) { $feld_out = 27 }
+        case (14) { $feld_out = 19 }
+        case (19) { $feld_out = 14 }
+        case (21) { $feld_out = 53 }
+        case (27) { $feld_out = 6  }
+        case (31) { $feld_out = 42 }
+        case (33) { $feld_out = 38 }
+        case (38) { $feld_out = 33 }
+        case (42) { $feld_out = 31 }
+        case (46) { $feld_out = 62 }
+        case (51) { $feld_out = 59 }
+        case (53) { $feld_out = 21 }
+        case (57) { $feld_out = 96 }
+        case (59) { $feld_out = 51 }
+        case (62) { $feld_out = 46 }
+        case (65) { $feld_out = 85 }
+        case (68) { $feld_out = 80 }
+        case (70) { $feld_out = 76 }
+        case (80) { $feld_out = 68 }
+        case (85) { $feld_out = 65 }
+        case (92) { $feld_out = 98 }
+        case (96) { $feld_out = 57 }
+        case (98) { $feld_out = 92 }
+        else { $feld_out = $feld_in }
+    }
+
+    return $feld_out; 
+}
+
+sub wuerfel
+{
+    return roll '1d6';
+}
